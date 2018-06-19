@@ -1,6 +1,6 @@
 # wickedQuotes
 
-There aren't any large, public databases of quotes to be found online. So I decided to create my own by parsing and cleaning up a wikiquote data dump. This repository contains the script that does that, along with a generated json file of quotes if you just want the data.
+There aren't any large, public datasets of quotes to be found online. So I decided to create my own by parsing and cleaning up a Wikiquote data dump. This repository contains the script that does that, along with a generated json file of quotes if you just want the data.
 
 ## Usage
 
