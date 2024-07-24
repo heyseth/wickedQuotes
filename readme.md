@@ -1,13 +1,12 @@
 # wickedQuotes
 
-There aren't any large, public datasets of quotes to be found online, so I decided to create my own by parsing and cleaning up a Wikiquote data dump. This repository contains the script that does that, along with a sample generated json file.
+There aren't any large, public datasets of quotes to be found online, so I decided to create my own by parsing and cleaning up a Wikiquote data dump.
 
 ## Setup
 
 ```
 python3 -m venv .venv
 source .venv/bin/activate
-pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -21,17 +20,17 @@ Extract the archive:
 
 `bzip2 -d enwikiquote-latest-pages-articles.xml.bz2`
 
-Then run the program:
+Run the program:
 
 `./parse.py enwikiquote-latest-pages-articles.xml`
 
-This may take a while (it takes a few minutes on my pc). 
+There are two optional parameters: quote cutoff length, and desired language. The default cutoff length is 100 characters, and the default language is English. The language must be specified as an [ISO Language Code](https://www.w3schools.com/tags/ref_language_codes.asp).
 
-There are two optional parameters. Quote cutoff length, and desired language. The default cutoff is 100 characters, and the default language is English. The language must be specified as an [ISO Language Code](https://www.w3schools.com/tags/ref_language_codes.asp).
+For instance, if you wanted quotes only in Spanish, and less than 50 characters in length, you would enter the following:
 
-For instance, if you wanted quotes only in Chinese, and less than 50 characters in length, you would do the following.
+`./parse.py enwikiquote-latest-pages-articles.xml 50 es`
 
-`./parse.py enwikiquote-latest-pages-articles.xml 50 zh-cn`
+Alternatively, if you don't want to specify a language, simply enter "all" (no quotes) for the language parameter. This will massively shorten the time it takes the program to run.
 
 ## License
 

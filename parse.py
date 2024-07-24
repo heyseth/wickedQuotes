@@ -1,13 +1,15 @@
 #!/usr/bin/env python 
 
-import re
 import sys
 import os
 import json
 import unwiki
 import xmltodict
-from langdetect import detect
 from xml.dom.minidom import parse
+from io import StringIO
+from html.parser import HTMLParser
+from unidecode import unidecode
+from langdetect import detect
 
 quotesObject = {}
 
@@ -15,7 +17,7 @@ if (len(sys.argv) == 1):
 	print("You must specify an input file.")
 	sys.exit()
 if (len(sys.argv) == 2):
-	cutoffArg = 50
+	cutoffArg = 100
 	langArg = "en"
 if (len(sys.argv) == 3):
 	cutoffArg = int(sys.argv[2])
@@ -37,17 +39,21 @@ def writeQuotes(content):
 
 		if line.startswith('==') and line[2] != "=":
 			write = False
-		if write and line.startswith('* ') and len(line) < (cutoffArg + 3):
+		if write and line.startswith('* '):
 
-			# would optimize, but since the program only needs to be run once, not really a priority
-			cleaned_line = unwiki.loads(line) + '\n'
-			cleaned_line = multireplace(cleaned_line, {"\\u2018": "'", "\\u2019": "'", "\\u2026": "...", "\\u2013": "-", "\\u2014": "-", "\\u201c": '"', "\\u201d": '"', "\\'": "'", "'''": "", "\n": ""})
-			cleaned_line = re.sub(r"<.*>|'('+)|\\\\x..|\\u....", "", cleaned_line)
-			cleaned_line = re.sub(r' +', ' ', cleaned_line)
-			cleaned_line = cleaned_line[2:]
+			cleaned_line = unwiki.loads(line) # Remove wiki markup
+			cleaned_line = strip_tags(cleaned_line) # Remove HTML tags
+			cleaned_line = unidecode(cleaned_line) # Convert unicode to ASCII
+			cleaned_line = cleaned_line.replace("\\'", "") # Remove escaped apostrophes
+			cleaned_line = cleaned_line.replace('\"', '') # Remove double quotes
+			' '.join(cleaned_line.split()) # Remove extra whitespace
+			cleaned_line = cleaned_line[2:] # Remove bullet point
 
-			if (detect(cleaned_line) == langArg and "://" not in cleaned_line):
-				quoteList.append(cleaned_line)
+			if ("://" not in cleaned_line and len(cleaned_line) < cutoffArg):
+				if (langArg == "all"):
+					quoteList.append(cleaned_line)
+				elif (detect(cleaned_line) == langArg):
+					quoteList.append(cleaned_line)
 
 		if line == '==Quotes==' or line == '== Quotes ==':
 			write = True
@@ -65,13 +71,25 @@ def handle(_, value):
 		pass
 	return True
 
-def multireplace(string, replacements):
-    substrs = sorted(replacements, key=len, reverse=True)
-    regexp = re.compile('|'.join(map(re.escape, substrs)))
-    return regexp.sub(lambda match: replacements[match.group(0)], string)
+class MLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.convert_charrefs= True
+        self.text = StringIO()
+    def handle_data(self, d):
+        self.text.write(d)
+    def get_data(self):
+        return self.text.getvalue()
 
-xmltodict.parse(open(str(sys.argv[1]), "rbU"), item_depth=2, item_callback=handle)
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
-os.mkdir('data')
+xmltodict.parse(open(str(sys.argv[1]), "rb"), item_depth=2, item_callback=handle)
+
+os.makedirs('data', exist_ok=True)
 with open('data/quotes-' + str(cutoffArg) + '-' + str(langArg) + '.json', 'w') as outfile:
-     json.dump(quotesObject, outfile, sort_keys = True, indent = 4, ensure_ascii = False)
+	json.dump(quotesObject, outfile, sort_keys=True, indent=4, ensure_ascii=True)
