@@ -1,5 +1,8 @@
+#!/usr/bin/env python 
+
 import re
 import sys
+import os
 import json
 import unwiki
 import xmltodict
@@ -69,5 +72,6 @@ def multireplace(string, replacements):
 
 xmltodict.parse(open(str(sys.argv[1]), "rbU"), item_depth=2, item_callback=handle)
 
-with open('quotes-' + str(cutoffArg) + '-' + str(langArg) + '.json', 'w') as outfile:
+os.mkdir('data')
+with open('data/quotes-' + str(cutoffArg) + '-' + str(langArg) + '.json', 'w') as outfile:
      json.dump(quotesObject, outfile, sort_keys = True, indent = 4, ensure_ascii = False)

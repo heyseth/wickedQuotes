@@ -16,7 +16,7 @@
 
 import re
 
-RE = re.compile(r"""\[\[(File|Category):[\s\S]+\]\]|
+RE = re.compile(r"""\[\[(File):[\s\S]+\]\]|
         \[\[[^|^\]]+\||
         \[\[|
         \]\]|

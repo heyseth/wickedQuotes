@@ -1,6 +1,15 @@
 # wickedQuotes
 
-There aren't any large, public datasets of quotes to be found online. So I decided to create my own by parsing and cleaning up a Wikiquote data dump. This repository contains the script that does that, along with a generated json file of quotes if you just want the data.
+There aren't any large, public datasets of quotes to be found online, so I decided to create my own by parsing and cleaning up a Wikiquote data dump. This repository contains the script that does that, along with a sample generated json file.
+
+## Setup
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -14,15 +23,15 @@ Extract the archive:
 
 Then run the program:
 
-`python parse.py enwikiquote-latest-pages-articles.xml`
+`./parse.py enwikiquote-latest-pages-articles.xml`
 
-This will probably take a while (it takes a few minutes on my pc). 
+This may take a while (it takes a few minutes on my pc). 
 
 There are two optional parameters. Quote cutoff length, and desired language. The default cutoff is 100 characters, and the default language is English. The language must be specified as an [ISO Language Code](https://www.w3schools.com/tags/ref_language_codes.asp).
 
 For instance, if you wanted quotes only in Chinese, and less than 50 characters in length, you would do the following.
 
-`python parse.py enwikiquote-latest-pages-articles.xml 50 zh-cn`
+`./parse.py enwikiquote-latest-pages-articles.xml 50 zh-cn`
 
 ## License
 
